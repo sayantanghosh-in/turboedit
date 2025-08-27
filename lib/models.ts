@@ -10,6 +10,10 @@ export type MenuBarOpt = {
 export type MenuBarOptGroup = MenuBarOpt[];
 
 export interface ITipTapEditorProps {
-  content: string;
-  onUpdate: (content: string) => void;
+  content: Node | null;
+  onUpdate: (content: object) => void;
+}
+
+export interface IEditorPreviewProps {
+  editorJsonContent?: object;
 }

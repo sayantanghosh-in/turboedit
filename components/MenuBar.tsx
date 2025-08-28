@@ -1,6 +1,6 @@
 "use client";
 
-import { Editor } from "@tiptap/react";
+import { Editor, useEditorState } from "@tiptap/react";
 
 import {
   IconBold,
@@ -20,6 +20,32 @@ import { MenuBarOptGroup } from "@/lib/models";
 import { Toggle } from "@/components/ui/toggle";
 
 export const MenuBar = ({ editor }: { editor: Editor | null }) => {
+  const editorState = useEditorState({
+    editor,
+
+    // the selector function is used to select the state you want to react to
+    selector: ({ editor }) => {
+      if (!editor) return null;
+
+      return {
+        isEditable: editor.isEditable,
+        currentSelection: editor.state.selection,
+        isH1Active: editor.isActive("heading", { level: 1 }),
+        isH2Active: editor.isActive("heading", { level: 2 }),
+        isH3Active: editor.isActive("heading", { level: 3 }),
+        isH4Active: editor.isActive("heading", { level: 4 }),
+        isH5Active: editor.isActive("heading", { level: 5 }),
+        isH6Active: editor.isActive("heading", { level: 6 }),
+        isParagraphActive: editor.isActive("paragraph"),
+        isBold: editor.isActive("bold"),
+        isItalic: editor.isActive("italic"),
+        isUnderline: editor.isActive("underline"),
+        isBulletListActive: editor.isActive("bulletList"),
+        isOrderedListActive: editor.isActive("orderedList"),
+      };
+    },
+  });
+
   if (!editor) {
     return null;
   }
@@ -27,77 +53,156 @@ export const MenuBar = ({ editor }: { editor: Editor | null }) => {
   const options: MenuBarOptGroup = [
     {
       id: "h1",
-      icon: <IconH1 size={14} />,
+      icon: (
+        <IconH1
+          className={
+            editorState?.isH1Active ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      pressed: editor.isActive("heading", { level: 1 }),
+      pressed: editorState?.isH1Active || false,
     },
     {
       id: "h2",
-      icon: <IconH2 size={14} />,
+      icon: (
+        <IconH2
+          className={
+            editorState?.isH2Active ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      pressed: editor.isActive("heading", { level: 2 }),
+      pressed: editorState?.isH2Active || false,
     },
     {
       id: "h3",
-      icon: <IconH3 size={14} />,
+      icon: (
+        <IconH3
+          className={
+            editorState?.isH3Active ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
-      pressed: editor.isActive("heading", { level: 3 }),
+      pressed: editorState?.isH3Active || false,
     },
     {
       id: "h4",
-      icon: <IconH4 size={14} />,
+      icon: (
+        <IconH4
+          className={
+            editorState?.isH4Active ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleHeading({ level: 4 }).run(),
-
-      pressed: editor.isActive("heading", { level: 4 }),
+      pressed: editorState?.isH4Active || false,
     },
     {
       id: "h5",
-      icon: <IconH5 size={14} />,
+      icon: (
+        <IconH5
+          className={
+            editorState?.isH5Active ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleHeading({ level: 5 }).run(),
-      pressed: editor.isActive("heading", { level: 5 }),
+      pressed: editorState?.isH5Active || false,
     },
     {
       id: "h6",
-      icon: <IconH6 size={14} />,
+      icon: (
+        <IconH6
+          className={
+            editorState?.isH6Active ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleHeading({ level: 6 }).run(),
-      pressed: editor.isActive("heading", { level: 6 }),
+      pressed: editorState?.isH6Active || false,
     },
     {
       id: "paragraph",
-      icon: <IconLetterT size={14} />,
+      icon: (
+        <IconLetterT
+          className={
+            editorState?.isParagraphActive ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().setParagraph().run(),
-      pressed: editor.isActive("paragraph"),
+      pressed: editorState?.isParagraphActive || false,
     },
 
     {
       id: "bold",
-      icon: <IconBold size={14} />,
+      icon: (
+        <IconBold
+          className={editorState?.isBold ? "text-blue-500" : "text-gray-900"}
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleBold().run(),
-      pressed: editor.isActive("bold"),
+      pressed: editorState?.isBold || false,
     },
     {
       id: "italic",
-      icon: <IconItalic size={14} />,
+      icon: (
+        <IconItalic
+          className={editorState?.isItalic ? "text-blue-500" : "text-gray-900"}
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleItalic().run(),
-      pressed: editor.isActive("italic"),
+      pressed: editorState?.isItalic || false,
     },
     {
       id: "underline",
-      icon: <IconUnderline size={14} />,
+      icon: (
+        <IconUnderline
+          className={
+            editorState?.isUnderline ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleUnderline().run(),
-      pressed: editor.isActive("underline"),
+      pressed: editorState?.isUnderline || false,
     },
     {
       id: "bulletList",
-      icon: <IconList size={14} />,
+      icon: (
+        <IconList
+          className={
+            editorState?.isBulletListActive ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleBulletList().run(),
-      pressed: editor.isActive("bulletList"),
+      pressed: editorState?.isBulletListActive || false,
     },
     {
       id: "orderedList",
-      icon: <IconListNumbers size={14} />,
+      icon: (
+        <IconListNumbers
+          className={
+            editorState?.isOrderedListActive ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
       action: () => editor.chain().focus().toggleOrderedList().run(),
-      pressed: editor.isActive("orderedList"),
+      pressed: editorState?.isOrderedListActive || false,
     },
   ];
   return (
@@ -108,7 +213,11 @@ export const MenuBar = ({ editor }: { editor: Editor | null }) => {
             <Toggle
               key={`menubar-option-${option?.id}`}
               aria-label={`Toggle ${option?.id}`}
-              className="cursor-pointer"
+              className={
+                option?.pressed
+                  ? "border-1 border-blue-500 cursor-pointer"
+                  : "cursor-pointer"
+              }
               pressed={option?.pressed}
               onPressedChange={() => option?.action()}
             >

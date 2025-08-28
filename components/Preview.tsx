@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { IEditorPreviewProps } from "@/lib/models";
-import { IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown, IconCopy } from "@tabler/icons-react";
 
 type SupportedLanguages = "markdown" | "html";
 
@@ -57,37 +57,35 @@ export const Preview = (props: IEditorPreviewProps) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="border flex items-center justify-between gap-2 flex-wrap p-2 bg-slate-50 rounded-md">
-        <h2>Preview</h2>
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="border bg-background rounded-md text-sm p-2 flex items-center gap-2">
-              <span>{languageOptions[selectedLanguage]?.name}</span>
-              <IconChevronDown size={12} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end">
-              {Array?.isArray(Object?.entries(languageOptions)) &&
-              Object?.entries(languageOptions)?.length > 0 ? (
-                <DropdownMenuGroup>
-                  {Object?.entries(languageOptions)?.map((language) => {
-                    return (
-                      <DropdownMenuItem
-                        key={`language-${language?.[0]}`}
-                        className="cursor-pointer"
-                      >
-                        {language?.[0]}
-                        <DropdownMenuShortcut>
-                          {language?.[1]?.extension}
-                        </DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuGroup>
-              ) : (
-                <DropdownMenuLabel>No Languages Found</DropdownMenuLabel>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger className="border bg-background rounded-md text-sm p-2 flex items-center gap-2">
+            <span>{languageOptions[selectedLanguage]?.name}</span>
+            <IconChevronDown size={12} />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end">
+            {Array?.isArray(Object?.entries(languageOptions)) &&
+            Object?.entries(languageOptions)?.length > 0 ? (
+              <DropdownMenuGroup>
+                {Object?.entries(languageOptions)?.map((language) => {
+                  return (
+                    <DropdownMenuItem
+                      key={`language-${language?.[0]}`}
+                      className="cursor-pointer"
+                    >
+                      {language?.[0]}
+                      <DropdownMenuShortcut>
+                        {language?.[1]?.extension}
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuGroup>
+            ) : (
+              <DropdownMenuLabel>No Languages Found</DropdownMenuLabel>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <IconCopy size={16} className="text-blue-500" />
       </div>
       {typeof editorMarkdownContent === "string" &&
       editorMarkdownContent?.length > 0 ? (

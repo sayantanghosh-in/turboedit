@@ -9,7 +9,15 @@ import Link from "next/link";
 export const Nav = () => {
   return (
     <nav className="bg-background border-x-1 px-2 flex items-center justify-between gap-2">
-      <Image width={14} height={14} alt="TurboEdit Logo" src="favicon.svg" />
+      <Link href="/">
+        <Image
+          width={16}
+          height={16}
+          alt="TurboEdit Logo"
+          src="favicon.svg"
+          className="w-[24px] h-[24px] md:w-[16px] md:h-[16px]"
+        />
+      </Link>
       <ul className="flex flex-row gap-4 items-center justify-end">
         <li>
           <Link
@@ -63,9 +71,9 @@ export const Nav = () => {
         </li>
         <li>
           <Link
-            aria-label="Sayantan Ghosh Github"
+            aria-label="TurboEdit Github"
             target="_blank"
-            href="https://github.com/sayantanghosh-in"
+            href="https://github.com/sayantanghosh-in/turboedit"
           >
             <IconBrandGithub
               className="w-[24px] h-[24px] md:w-[16px] md:h-[16px]"

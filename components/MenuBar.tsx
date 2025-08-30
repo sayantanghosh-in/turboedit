@@ -4,6 +4,7 @@ import { Editor, useEditorState } from "@tiptap/react";
 
 import {
   IconBold,
+  IconCode,
   IconH1,
   IconH2,
   IconH3,
@@ -16,13 +17,17 @@ import {
   IconListNumbers,
   IconUnderline,
 } from "@tabler/icons-react";
-import { MenuBarOptGroup } from "@/lib/models";
+import { ITipTapEditorProps, MenuBarOptGroup } from "@/lib/models";
 import { Toggle } from "@/components/ui/toggle";
+import { Button } from "./ui/button";
+import { useCallback, useEffect } from "react";
 
-export const MenuBar = ({ editor }: { editor: Editor | null }) => {
+export const MenuBar = ({
+  editor,
+  onViewCodeClick,
+}: Pick<ITipTapEditorProps, "onViewCodeClick"> & { editor: Editor | null }) => {
   const editorState = useEditorState({
     editor,
-
     // the selector function is used to select the state you want to react to
     selector: ({ editor }) => {
       if (!editor) return null;
@@ -30,6 +35,7 @@ export const MenuBar = ({ editor }: { editor: Editor | null }) => {
       return {
         isEditable: editor.isEditable,
         currentSelection: editor.state.selection,
+        currentContentLength: editor.getText().length,
         isH1Active: editor.isActive("heading", { level: 1 }),
         isH2Active: editor.isActive("heading", { level: 2 }),
         isH3Active: editor.isActive("heading", { level: 3 }),
@@ -45,6 +51,22 @@ export const MenuBar = ({ editor }: { editor: Editor | null }) => {
       };
     },
   });
+
+  useEffect(() => {
+    try {
+      if (editor && !editorState?.currentContentLength) {
+        editor.commands.clearContent();
+      }
+    } catch (e) {
+      console.error("Error while clearing editor content", e);
+    }
+  }, [editor, editorState?.currentContentLength]);
+
+  const handleViewCodeClick = useCallback(() => {
+    if (editor && typeof onViewCodeClick === "function") {
+      onViewCodeClick(editor?.getJSON());
+    }
+  }, [editor, onViewCodeClick]);
 
   if (!editor) {
     return null;
@@ -205,29 +227,40 @@ export const MenuBar = ({ editor }: { editor: Editor | null }) => {
       pressed: editorState?.isOrderedListActive || false,
     },
   ];
+
   return (
-    <div className="border flex items-center gap-2 flex-wrap p-2 bg-slate-50 rounded-md">
-      {Array?.isArray(options) && options?.length > 0 ? (
-        options?.map((option) => {
-          return (
-            <Toggle
-              key={`menubar-option-${option?.id}`}
-              aria-label={`Toggle ${option?.id}`}
-              className={
-                option?.pressed
-                  ? "border-1 border-blue-500 cursor-pointer"
-                  : "cursor-pointer"
-              }
-              pressed={option?.pressed}
-              onPressedChange={() => option?.action()}
-            >
-              {option?.icon}
-            </Toggle>
-          );
-        })
-      ) : (
-        <></>
-      )}
+    <div className="sricky top-0 border p-2 bg-slate-50 rounded-md flex justify-between gap-4 md:gap-24">
+      <div className=" flex items-center gap-2 flex-wrap">
+        {Array?.isArray(options) && options?.length > 0 ? (
+          options?.map((option) => {
+            return (
+              <Toggle
+                key={`menubar-option-${option?.id}`}
+                aria-label={`Toggle ${option?.id}`}
+                className={
+                  option?.pressed
+                    ? "border-1 border-blue-500 cursor-pointer"
+                    : "cursor-pointer"
+                }
+                pressed={option?.pressed}
+                onPressedChange={() => option?.action()}
+              >
+                {option?.icon}
+              </Toggle>
+            );
+          })
+        ) : (
+          <></>
+        )}
+      </div>
+      <Button
+        className="flex items-center cursor-pointer transition duration-700 bg-linear-65 from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500"
+        disabled={editorState?.currentContentLength === 0}
+        onClick={handleViewCodeClick}
+      >
+        <IconCode size={16} stroke={2} className="text-background" />
+        <span className="hidden md:inline">View Code</span>
+      </Button>
     </div>
   );
 };

@@ -1,48 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { renderToMarkdown } from "@tiptap/static-renderer";
+import { toast } from "sonner";
 import StarterKit from "@tiptap/starter-kit";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
 import { IEditorPreviewProps } from "@/lib/models";
-import { IconChevronDown, IconCopy } from "@tabler/icons-react";
-
-type SupportedLanguages = "markdown" | "html";
-
-const languageOptions: {
-  [key in SupportedLanguages]: {
-    id: string;
-    name: string;
-    extension: string;
-  };
-} = {
-  markdown: {
-    id: "markdown",
-    name: "Markdown",
-    extension: ".md",
-  },
-  html: {
-    id: "html",
-    name: "HTML",
-    extension: ".html",
-  },
-};
+import { IconCopy, IconEdit } from "@tabler/icons-react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { copyToClipboard } from "@/lib/utils";
 
 export const Preview = (props: IEditorPreviewProps) => {
-  const [selectedLanguage] = useState<SupportedLanguages>("markdown");
-  const [editorMarkdownContent, setEditorMarkdownContent] = useState<string>();
+  const [fileName, setFileName] = useState<string>("README.md");
+  const [editorMarkdownContent, setEditorMarkdownContent] = useState<
+    string | null
+  >("");
+
+  const handleCopy = useCallback(async () => {
+    const success = await copyToClipboard(
+      editorMarkdownContent?.replaceAll("\n\n", "\n") || ""
+    );
+    if (success) {
+      toast("Copied Successfully!", {
+        position: "top-center",
+        style: {
+          backgroundColor: "green",
+          color: "white",
+        },
+      });
+    } else {
+      toast?.error("Could not copy, please check browser console", {
+        position: "top-center",
+        style: {
+          backgroundColor: "red",
+          color: "white",
+        },
+      });
+    }
+  }, [editorMarkdownContent]);
 
   useEffect(() => {
     if (props?.editorJsonContent) {
@@ -51,45 +49,37 @@ export const Preview = (props: IEditorPreviewProps) => {
         content: props?.editorJsonContent,
       });
       setEditorMarkdownContent(md);
+    } else {
+      setEditorMarkdownContent(null);
     }
   }, [props?.editorJsonContent]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="border flex items-center justify-between gap-2 flex-wrap p-2 bg-slate-50 rounded-md">
-        <DropdownMenu>
-          <DropdownMenuTrigger className="border bg-background rounded-md text-sm p-2 flex items-center gap-2">
-            <span>{languageOptions[selectedLanguage]?.name}</span>
-            <IconChevronDown size={12} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end">
-            {Array?.isArray(Object?.entries(languageOptions)) &&
-            Object?.entries(languageOptions)?.length > 0 ? (
-              <DropdownMenuGroup>
-                {Object?.entries(languageOptions)?.map((language) => {
-                  return (
-                    <DropdownMenuItem
-                      key={`language-${language?.[0]}`}
-                      className="cursor-pointer"
-                    >
-                      {language?.[0]}
-                      <DropdownMenuShortcut>
-                        {language?.[1]?.extension}
-                      </DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuGroup>
-            ) : (
-              <DropdownMenuLabel>No Languages Found</DropdownMenuLabel>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <IconCopy size={16} className="text-blue-500" />
+    <div className="flex flex-col gap-2 relative">
+      <div className="sticky top-0 border flex justify-between items-center gap-4 md:gap-24 flex-wrap p-2 bg-slate-50 rounded-md">
+        <Input
+          type="text"
+          placeholder="Filename: ex - README.md"
+          value={fileName}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setFileName(e?.target.value?.trim() || "")
+          }
+          className="bg-background w-48 md:w-96"
+        />
+        <div className="flex items-center gap-4">
+          <IconCopy size={16} className="text-blue-500" onClick={handleCopy} />
+          <Button
+            className="flex items-center cursor-pointer transition duration-700 bg-linear-65 from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500"
+            onClick={() => props?.setShowCodeSection(false)}
+          >
+            <IconEdit size={16} stroke={2} className="text-background" />
+            <span className="hidden md:inline">Edit</span>
+          </Button>
+        </div>
       </div>
       {typeof editorMarkdownContent === "string" &&
       editorMarkdownContent?.length > 0 ? (
-        <div className="h-[350px] md:h-[480px] overflow-hidden overflow-y-auto p-2 bg-slate-50 rounded-md border">
+        <div className="h-[calc(100vh-136.8px-1.5rem-5px)] overflow-hidden overflow-y-auto p-2 bg-slate-50 rounded-md border">
           <SyntaxHighlighter
             language="markdown"
             style={docco}
@@ -101,7 +91,7 @@ export const Preview = (props: IEditorPreviewProps) => {
           </SyntaxHighlighter>
         </div>
       ) : (
-        <div className="h-[350px] md:h-[480px] p-2 bg-slate-50 rounded-md border flex flex-col justify-center items-center gap-2 text-center">
+        <div className="h-[calc(100vh-136.8px-1.5rem-5px)] p-2 bg-slate-50 rounded-md border flex flex-col justify-center items-center gap-2 text-center">
           <h2>Your Words, Our Code.</h2>
           <p className="max-w-3/5">
             There&apos;s a beautiful blank space on your left. It&apos;s waiting

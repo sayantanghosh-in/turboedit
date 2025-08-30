@@ -86,12 +86,12 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <div>
-          <header className="sticky top-0 mt-1 border-y-1 bg-background px-2 md:px-8 lg:px-16">
+          <header className="sticky top-0 mt-1 border-y-1 bg-background px-2 md:px-32 lg:px-64">
             <Nav />
           </header>
           <main className="mb-[58px]">{children}</main>
           <Gradient additionalClass="fixed bottom-[34px] border-t-1 bg-background" />
-          <footer className="fixed bottom-0 w-full border-y-1 bg-background px-2 md:px-8 lg:px-16">
+          <footer className="fixed bottom-0 w-full border-y-1 bg-background px-2 md:px-32 lg:px-64">
             <section className="border-x-1 px-2 text-xs flex justify-center items-center gap-0.5 py-2">
               <span>Made with</span>
               <IconHeart size={12} fill="var(--destructive)" /> by

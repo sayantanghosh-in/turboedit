@@ -7,10 +7,28 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 import { MenuBar } from "./MenuBar";
 import { ITipTapEditorProps } from "@/lib/models";
-import { DEFAULT_EDITOR_CONTENT } from "@/lib/constants";
+import { DEFAULT_EDITOR_CONTENT, SESSION_STORAGE_KEY } from "@/lib/constants";
 
 // create a lowlight instance with all languages loaded
 const lowlight = createLowlight(all);
+
+// Utility function to get content from session storage or use default
+const getInitialContent = () => {
+  if (!window || !window?.sessionStorage) return DEFAULT_EDITOR_CONTENT;
+  const storedData = sessionStorage.getItem(SESSION_STORAGE_KEY);
+  if (storedData) {
+    try {
+      // Attempt to parse the JSON string
+      return JSON.parse(storedData);
+    } catch (error) {
+      console.error("Error parsing content from session storage:", error);
+      // Fallback to default content if parsing fails
+      return DEFAULT_EDITOR_CONTENT;
+    }
+  }
+  // If no data exists in session storage, return the default
+  return DEFAULT_EDITOR_CONTENT;
+};
 
 export const TipTapEditor = (props: ITipTapEditorProps) => {
   const editor = useEditor({
@@ -31,7 +49,8 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
         lowlight,
       }),
     ],
-    content: DEFAULT_EDITOR_CONTENT,
+    // Use the utility function to get the initial content
+    content: getInitialContent(),
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
     editorProps: {

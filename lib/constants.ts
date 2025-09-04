@@ -56,3 +56,5 @@ function sayHello() {
   <h3>Ready?</h3>
   <p>Now it's your turn. Delete all of this text and start writing your own content!</p>
 </div>`;
+
+export const SESSION_STORAGE_KEY = "turboedit-json-data";

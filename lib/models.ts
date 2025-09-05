@@ -3,7 +3,7 @@ import { JSX } from "react";
 export type MenuBarOpt = {
   id: string;
   icon: JSX.Element;
-  action: () => void;
+  action: (arg?: string) => void;
   pressed: boolean;
 };
 

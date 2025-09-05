@@ -1,10 +1,3 @@
-export const DEFAULT_EDITOR_CONTENT_LOADING = `<div class="content">
-<h1>Welcome to TurboEdit 🚀</h1>
-<p></p>
-<p>Please wait while we are making everything ready for you...</p>
-<p>Contact <a href="https://sayantanghosh.in">Sayantan Ghosh</a> for more support</p>
-</div>`;
-
 export const DEFAULT_EDITOR_CONTENT = `<div class="content">
   <h1>Welcome to TurboEdit 🚀</h1>
   <p></p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Editor, useEditorState } from "@tiptap/react";
 import {
   IconBold,
@@ -18,10 +18,12 @@ import {
   IconListNumbers,
   IconUnderline,
   IconRefresh,
+  IconLink,
 } from "@tabler/icons-react";
 
 import { ITipTapEditorProps, MenuBarOpt, MenuBarOptGroup } from "@/lib/models";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -37,11 +39,50 @@ import {
 import { Toggle } from "./ui/toggle";
 import { SESSION_STORAGE_KEY } from "@/lib/constants";
 
+const LinkPopoverContent = ({
+  editor,
+  linkItem,
+}: {
+  editor: Editor;
+  linkItem: MenuBarOpt;
+}) => {
+  const [url, setUrl] = useState<string>(
+    editor?.getAttributes("link").href || ""
+  );
+
+  useEffect(() => {
+    // This effect runs whenever the PopoverContent is mounted
+    // and whenever the editor's state changes.
+    // It grabs the URL of the currently selected link and updates
+    // the local state for the input field.
+    const currentUrl = editor.isActive("link")
+      ? editor.getAttributes("link").href
+      : "";
+    setUrl(currentUrl);
+  }, [editor]);
+
+  return (
+    <PopoverContent className="w-80 flex items-center gap-2">
+      <Input
+        type="text"
+        placeholder="https://example.com/image300x300.png"
+        value={url}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          setUrl(e?.target?.value || "")
+        }
+      />
+      <Button onClick={() => linkItem?.action(url)}>Add</Button>
+    </PopoverContent>
+  );
+};
+
 export const MenuBar = ({
   editor,
   onViewCodeClick,
 }: Pick<ITipTapEditorProps, "onViewCodeClick"> & { editor: Editor | null }) => {
   const [isHeadingDropdownOpen, setIsHeadingDropdownOpen] = useState(false);
+  const [isLinkItemPopoverOpen, setIsLinkItemPopoverOpen] =
+    useState<boolean>(false);
   const [isListDropdownOpen, setIsListDropdownOpen] = useState(false);
 
   const editorState = useEditorState({
@@ -64,6 +105,7 @@ export const MenuBar = ({
         isBold: editor.isActive("bold"),
         isItalic: editor.isActive("italic"),
         isUnderline: editor.isActive("underline"),
+        isLink: editor.isActive("link"),
         isBulletListActive: editor.isActive("bulletList"),
         isOrderedListActive: editor.isActive("orderedList"),
       };
@@ -284,6 +326,42 @@ export const MenuBar = ({
     editorState?.isOrderedListActive,
   ]);
 
+  const linkItem: MenuBarOpt | undefined = useMemo(() => {
+    if (!editor) return;
+    return {
+      id: "link",
+      icon: (
+        <IconLink
+          className={editorState?.isLink ? "text-blue-500" : "text-gray-900"}
+          size={14}
+        />
+      ),
+      action: (url?: string) => {
+        // empty
+        if (!url || url === "") {
+          editor.chain().focus().extendMarkRange("link").unsetLink().run();
+
+          return;
+        }
+
+        // update link
+        try {
+          editor
+            .chain()
+            .focus()
+            .extendMarkRange("link")
+            .setLink({ href: url })
+            .run();
+        } catch (e) {
+          console.error("Error while doing link operation", e);
+        } finally {
+          setIsLinkItemPopoverOpen(false);
+        }
+      },
+      pressed: editorState?.isLink || false,
+    };
+  }, [editor, editorState?.isLink]);
+
   const getSelectedHeadingToggle = useCallback(() => {
     const selectedHeadingOptionIndex = editorState?.isH1Active
       ? 0
@@ -370,7 +448,7 @@ export const MenuBar = ({
 
   return (
     <div className="sricky top-0 border p-2 bg-slate-50 rounded-md flex justify-between gap-4 md:gap-24">
-      <div className=" flex items-center gap-2 flex-wrap">
+      <div className=" flex items-center gap-2 overflow-x-auto">
         {Array?.isArray(headingOptions) && headingOptions?.length > 0 ? (
           <Popover
             open={isHeadingDropdownOpen}
@@ -406,7 +484,7 @@ export const MenuBar = ({
         )}
         {paragraphItem ? (
           <Toggle
-            aria-label="Paragraph Options Toggle"
+            aria-label="Paragraph Option Toggle"
             className={
               editorState?.isParagraphActive
                 ? "text-blue-500 cursor-pointer bg-slate-200"
@@ -421,7 +499,7 @@ export const MenuBar = ({
         )}
         {boldItem ? (
           <Toggle
-            aria-label="Bold Options Toggle"
+            aria-label="Bold Option Toggle"
             className={
               editorState?.isBold
                 ? "text-blue-500 cursor-pointer bg-slate-200"
@@ -436,7 +514,7 @@ export const MenuBar = ({
         )}
         {italicItem ? (
           <Toggle
-            aria-label="Italic Options Toggle"
+            aria-label="Italic Option Toggle"
             className={
               editorState?.isItalic
                 ? "text-blue-500 cursor-pointer bg-slate-200"
@@ -451,7 +529,7 @@ export const MenuBar = ({
         )}
         {underlineItem ? (
           <Toggle
-            aria-label="Underline Options Toggle"
+            aria-label="Underline Option Toggle"
             className={
               editorState?.isUnderline
                 ? "text-blue-500 cursor-pointer bg-slate-200"
@@ -491,6 +569,32 @@ export const MenuBar = ({
                 </CommandList>
               </Command>
             </PopoverContent>
+          </Popover>
+        ) : (
+          <></>
+        )}
+        {linkItem ? (
+          <Popover
+            open={isLinkItemPopoverOpen}
+            onOpenChange={setIsLinkItemPopoverOpen}
+          >
+            <PopoverTrigger asChild>
+              <Toggle
+                aria-label="Link Option Toggle"
+                className={
+                  editorState?.isLink
+                    ? "text-blue-500 cursor-pointer bg-slate-200"
+                    : "cursor-pointer bg-slate-100"
+                }
+              >
+                {linkItem?.icon}
+              </Toggle>
+            </PopoverTrigger>
+            <LinkPopoverContent
+              key={`popover-open-${isLinkItemPopoverOpen}`}
+              editor={editor}
+              linkItem={linkItem}
+            />
           </Popover>
         ) : (
           <></>

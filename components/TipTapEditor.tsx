@@ -2,16 +2,14 @@
 
 import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+import DragHandle from "@tiptap/extension-drag-handle-react";
 import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 import { MenuBar } from "./MenuBar";
 import { ITipTapEditorProps } from "@/lib/models";
-import {
-  DEFAULT_EDITOR_CONTENT,
-  DEFAULT_EDITOR_CONTENT_LOADING,
-  SESSION_STORAGE_KEY,
-} from "@/lib/constants";
+import { DEFAULT_EDITOR_CONTENT, SESSION_STORAGE_KEY } from "@/lib/constants";
+import { IconGripVertical } from "@tabler/icons-react";
 
 // create a lowlight instance with all languages loaded
 const lowlight = createLowlight(all);
@@ -48,19 +46,24 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
             class: "list-decimal ml-4",
           },
         },
+        link: {
+          defaultProtocol: "https",
+          enableClickSelection: true,
+          openOnClick: false,
+        },
       }),
       CodeBlockLowlight.configure({
         lowlight,
       }),
     ],
     // Use the utility function to get the initial content
-    content: DEFAULT_EDITOR_CONTENT_LOADING,
+    content: DEFAULT_EDITOR_CONTENT,
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
-          "h-[calc(100vh-136.8px-1.5rem-5px)] border rounded-md bg-slate-50 py-2 px-3 overflow-hidden overflow-y-auto",
+          "h-[calc(100vh-136.8px-1.5rem-5px)] border rounded-md bg-slate-50 py-2 px-4 overflow-hidden overflow-y-auto",
       },
     },
   });
@@ -79,6 +82,17 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
   ) : (
     <div className="flex flex-col gap-2 relative">
       <MenuBar editor={editor} onViewCodeClick={props?.onViewCodeClick} />
+      <DragHandle
+        editor={editor}
+        computePositionConfig={{
+          placement: "left",
+        }}
+      >
+        <IconGripVertical
+          size={16}
+          className="text-gray-900 hover:text-blue-500 cursor-grab"
+        />
+      </DragHandle>
       <EditorContent editor={editor} />
     </div>
   );

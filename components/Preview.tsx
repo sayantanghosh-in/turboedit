@@ -8,20 +8,39 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 import { IEditorPreviewProps } from "@/lib/models";
-import { IconCopy, IconEdit } from "@tabler/icons-react";
+import {
+  IconCopy,
+  IconEdit,
+  IconInfoCircle,
+  IconSettings,
+} from "@tabler/icons-react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { copyToClipboard } from "@/lib/utils";
+import { FRONT_MATTER_LOCAL_STORAGE_KEY } from "@/lib/constants";
 
 export const Preview = (props: IEditorPreviewProps) => {
-  const [fileName, setFileName] = useState<string>("README.md");
+  const [frontMatter, setFrontMatter] = useState<string>("");
   const [editorMarkdownContent, setEditorMarkdownContent] = useState<
     string | null
   >("");
 
   const handleCopy = useCallback(async () => {
     const success = await copyToClipboard(
-      editorMarkdownContent?.replaceAll("\n\n", "\n") || ""
+      (typeof frontMatter === "string" && frontMatter?.length > 0
+        ? frontMatter + "\n"
+        : "") + editorMarkdownContent?.replaceAll("\n\n", "\n") || ""
     );
     if (success) {
       toast("Copied Successfully!", {
@@ -40,7 +59,16 @@ export const Preview = (props: IEditorPreviewProps) => {
         },
       });
     }
-  }, [editorMarkdownContent]);
+  }, [editorMarkdownContent, frontMatter]);
+
+  const handleFrontMatterUpdate = useCallback(() => {
+    if (window && window?.localStorage) {
+      window?.localStorage?.setItem(
+        FRONT_MATTER_LOCAL_STORAGE_KEY,
+        frontMatter
+      );
+    }
+  }, [frontMatter]);
 
   useEffect(() => {
     if (props?.editorJsonContent) {
@@ -54,20 +82,84 @@ export const Preview = (props: IEditorPreviewProps) => {
     }
   }, [props?.editorJsonContent]);
 
+  useEffect(() => {
+    // Load frontMatter from localStorage
+    if (!window || !window?.localStorage) setFrontMatter("");
+    const storedData = localStorage.getItem(FRONT_MATTER_LOCAL_STORAGE_KEY);
+    if (storedData) {
+      setFrontMatter(storedData);
+      return;
+    }
+    setFrontMatter("");
+  }, []);
+
   return (
     <div className="flex flex-col gap-2 relative">
       <div className="sticky top-0 border flex justify-between items-center gap-4 md:gap-24 flex-wrap p-2 bg-slate-50 rounded-md">
-        <Input
-          type="text"
-          placeholder="Filename: ex - README.md"
-          value={fileName}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            setFileName(e?.target.value?.trim() || "")
-          }
-          className="bg-background w-48 md:w-96"
-        />
-        <div className="flex items-center gap-4">
-          <IconCopy size={16} className="text-blue-500" onClick={handleCopy} />
+        <div className="flex items-center gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="items-center gap-2 cursor-pointer">
+                <IconSettings
+                  size={16}
+                  stroke={2}
+                  className="text-background"
+                />
+                <span className="hidden md:inline">Configure Front Matter</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Configure Front matter</DialogTitle>
+                <DialogDescription>
+                  Make changes to your front matter here.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4">
+                <div className="grid gap-3">
+                  <Label htmlFor="name-1">Front Matter</Label>
+                  <Textarea
+                    placeholder="Type your front matter here..."
+                    className="max-h-48"
+                    value={frontMatter}
+                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                      setFrontMatter(e?.target.value?.trim() || "")
+                    }
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button
+                    className="cursor-pointer"
+                    onClick={handleFrontMatterUpdate}
+                  >
+                    Done
+                  </Button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <IconInfoCircle
+            size={12}
+            className="text-gray-700 cursor-pointer"
+            onClick={() => {
+              window.open("https://frontmatter.codes/docs", "_blank");
+            }}
+          />
+        </div>
+        <div className="flex items-center gap-2 md:gap-4">
+          <IconCopy
+            size={16}
+            stroke={2}
+            className={
+              typeof editorMarkdownContent === "string" &&
+              editorMarkdownContent?.length > 0
+                ? "text-gray-900 cursor-pointer"
+                : "text-gray-900 cursor-not-allowed"
+            }
+            onClick={handleCopy}
+          />
           <Button
             className="flex items-center cursor-pointer transition duration-700 bg-linear-65 from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500"
             onClick={() => props?.setShowCodeSection(false)}
@@ -87,7 +179,9 @@ export const Preview = (props: IEditorPreviewProps) => {
             className="m-0 p-0"
             id="preview-pre"
           >
-            {editorMarkdownContent?.replaceAll("\n\n", "\n")}
+            {(typeof frontMatter === "string" && frontMatter?.length > 0
+              ? frontMatter + "\n"
+              : "") + editorMarkdownContent?.replaceAll("\n\n", "\n")}
           </SyntaxHighlighter>
         </div>
       ) : (

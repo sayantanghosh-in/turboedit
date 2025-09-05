@@ -17,6 +17,7 @@ import {
   IconList,
   IconListNumbers,
   IconUnderline,
+  IconRefresh,
 } from "@tabler/icons-react";
 
 import { ITipTapEditorProps, MenuBarOpt, MenuBarOptGroup } from "@/lib/models";
@@ -41,7 +42,6 @@ export const MenuBar = ({
   onViewCodeClick,
 }: Pick<ITipTapEditorProps, "onViewCodeClick"> & { editor: Editor | null }) => {
   const [isHeadingDropdownOpen, setIsHeadingDropdownOpen] = useState(false);
-  const [isMarkDropdownOpen, setIsMarkDropdownOpen] = useState(false);
   const [isListDropdownOpen, setIsListDropdownOpen] = useState(false);
 
   const editorState = useEditorState({
@@ -70,9 +70,9 @@ export const MenuBar = ({
     },
   });
 
-  useEffect(() => {
+  const handleClearContent = useCallback(() => {
     try {
-      if (editor && !editorState?.currentContentLength) {
+      if (editor && editorState?.currentContentLength) {
         editor.commands.clearContent();
       }
     } catch (e) {
@@ -197,53 +197,52 @@ export const MenuBar = ({
     };
   }, [editor, editorState?.isParagraphActive]);
 
-  const markOptions = useMemo(() => {
-    if (!editor) return [];
-    return [
-      {
-        id: "bold",
-        icon: (
-          <IconBold
-            className={editorState?.isBold ? "text-blue-500" : "text-gray-900"}
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleBold().run(),
-        pressed: editorState?.isBold || false,
-      },
-      {
-        id: "italic",
-        icon: (
-          <IconItalic
-            className={
-              editorState?.isItalic ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleItalic().run(),
-        pressed: editorState?.isItalic || false,
-      },
-      {
-        id: "underline",
-        icon: (
-          <IconUnderline
-            className={
-              editorState?.isUnderline ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleUnderline().run(),
-        pressed: editorState?.isUnderline || false,
-      },
-    ];
-  }, [
-    editor,
-    editorState?.isBold,
-    editorState?.isItalic,
-    editorState?.isUnderline,
-  ]);
+  const boldItem: MenuBarOpt | undefined = useMemo(() => {
+    if (!editor) return;
+    return {
+      id: "bold",
+      icon: (
+        <IconBold
+          className={editorState?.isBold ? "text-blue-500" : "text-gray-900"}
+          size={14}
+        />
+      ),
+      action: () => editor.chain().focus().toggleBold().run(),
+      pressed: editorState?.isBold || false,
+    };
+  }, [editor, editorState?.isBold]);
+
+  const italicItem: MenuBarOpt | undefined = useMemo(() => {
+    if (!editor) return;
+    return {
+      id: "italic",
+      icon: (
+        <IconItalic
+          className={editorState?.isItalic ? "text-blue-500" : "text-gray-900"}
+          size={14}
+        />
+      ),
+      action: () => editor.chain().focus().toggleItalic().run(),
+      pressed: editorState?.isItalic || false,
+    };
+  }, [editor, editorState?.isItalic]);
+
+  const underlineItem: MenuBarOpt | undefined = useMemo(() => {
+    if (!editor) return;
+    return {
+      id: "underline",
+      icon: (
+        <IconUnderline
+          className={
+            editorState?.isUnderline ? "text-blue-500" : "text-gray-900"
+          }
+          size={14}
+        />
+      ),
+      action: () => editor.chain().focus().toggleUnderline().run(),
+      pressed: editorState?.isUnderline || false,
+    };
+  }, [editor, editorState?.isUnderline]);
 
   const listOptions = useMemo(() => {
     if (!editor) return [];
@@ -326,38 +325,6 @@ export const MenuBar = ({
     headingOptions,
   ]);
 
-  const getSelectedMarkToggle = useCallback(() => {
-    const selectedMarkOptionIndex = editorState?.isBold
-      ? 0
-      : editorState?.isItalic
-      ? 1
-      : editorState?.isUnderline
-      ? 2
-      : -1;
-    return (
-      <Toggle
-        aria-label="Mark Options Trigger Toggle"
-        className={
-          selectedMarkOptionIndex > -1
-            ? "text-blue-500 cursor-pointer bg-slate-200"
-            : "cursor-pointer bg-slate-100"
-        }
-        role="combobox"
-      >
-        {selectedMarkOptionIndex > -1 ? (
-          markOptions[selectedMarkOptionIndex]?.icon
-        ) : (
-          <IconBold className="text-gray-900" size={14} />
-        )}
-      </Toggle>
-    );
-  }, [
-    editorState?.isBold,
-    editorState?.isItalic,
-    editorState?.isUnderline,
-    markOptions,
-  ]);
-
   const getSelectedListToggle = useCallback(() => {
     const selectedListOptionIndex = editorState?.isBulletListActive
       ? 0
@@ -386,6 +353,16 @@ export const MenuBar = ({
     editorState?.isOrderedListActive,
     listOptions,
   ]);
+
+  useEffect(() => {
+    try {
+      if (editor && !editorState?.currentContentLength) {
+        editor.commands.clearContent();
+      }
+    } catch (e) {
+      console.error("Error while clearing editor content", e);
+    }
+  }, [editor, editorState?.currentContentLength]);
 
   if (!editor) {
     return null;
@@ -442,34 +419,48 @@ export const MenuBar = ({
         ) : (
           <></>
         )}
-        {Array?.isArray(markOptions) && markOptions?.length > 0 ? (
-          <Popover
-            open={isMarkDropdownOpen}
-            onOpenChange={setIsMarkDropdownOpen}
+        {boldItem ? (
+          <Toggle
+            aria-label="Bold Options Toggle"
+            className={
+              editorState?.isBold
+                ? "text-blue-500 cursor-pointer bg-slate-200"
+                : "cursor-pointer bg-slate-100"
+            }
+            onPressedChange={() => boldItem?.action()}
           >
-            <PopoverTrigger asChild>{getSelectedMarkToggle()}</PopoverTrigger>
-            <PopoverContent className="w-10 p-0">
-              <Command>
-                <CommandList>
-                  <CommandEmpty>No Mark options found.</CommandEmpty>
-                  <CommandGroup>
-                    {markOptions.map((markOption) => (
-                      <CommandItem
-                        key={markOption?.id}
-                        value={markOption?.id}
-                        onSelect={() => {
-                          markOption?.action();
-                          setIsMarkDropdownOpen(false);
-                        }}
-                      >
-                        {markOption?.icon}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+            {boldItem?.icon}
+          </Toggle>
+        ) : (
+          <></>
+        )}
+        {italicItem ? (
+          <Toggle
+            aria-label="Italic Options Toggle"
+            className={
+              editorState?.isItalic
+                ? "text-blue-500 cursor-pointer bg-slate-200"
+                : "cursor-pointer bg-slate-100"
+            }
+            onPressedChange={() => italicItem?.action()}
+          >
+            {italicItem?.icon}
+          </Toggle>
+        ) : (
+          <></>
+        )}
+        {underlineItem ? (
+          <Toggle
+            aria-label="Underline Options Toggle"
+            className={
+              editorState?.isUnderline
+                ? "text-blue-500 cursor-pointer bg-slate-200"
+                : "cursor-pointer bg-slate-100"
+            }
+            onPressedChange={() => underlineItem?.action()}
+          >
+            {underlineItem?.icon}
+          </Toggle>
         ) : (
           <></>
         )}
@@ -505,14 +496,22 @@ export const MenuBar = ({
           <></>
         )}
       </div>
-      <Button
-        className="flex items-center cursor-pointer transition duration-700 bg-linear-65 from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500"
-        disabled={editorState?.currentContentLength === 0}
-        onClick={handleViewCodeClick}
-      >
-        <IconCode size={16} stroke={2} className="text-background" />
-        <span>View Code</span>
-      </Button>
+      <div className="flex items-center gap-2 md:gap-4">
+        <IconRefresh
+          size={16}
+          stroke={2}
+          className="text-gray-90 transition transition-duration-200 cursor-pointer hover:rotate-[30deg]"
+          onClick={handleClearContent}
+        />
+        <Button
+          className="flex items-center cursor-pointer transition duration-700 bg-linear-65 from-purple-500 to-pink-500 hover:from-pink-500 hover:to-purple-500"
+          disabled={editorState?.currentContentLength === 0}
+          onClick={handleViewCodeClick}
+        >
+          <IconCode size={16} stroke={2} className="text-background" />
+          <span className="hidden md:inline">View Code</span>
+        </Button>
+      </div>
     </div>
   );
 };

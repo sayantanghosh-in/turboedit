@@ -1,13 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
 import { MenuBar } from "./MenuBar";
 import { ITipTapEditorProps } from "@/lib/models";
-import { DEFAULT_EDITOR_CONTENT, SESSION_STORAGE_KEY } from "@/lib/constants";
+import {
+  DEFAULT_EDITOR_CONTENT,
+  DEFAULT_EDITOR_CONTENT_LOADING,
+  SESSION_STORAGE_KEY,
+} from "@/lib/constants";
 
 // create a lowlight instance with all languages loaded
 const lowlight = createLowlight(all);
@@ -50,7 +54,7 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
       }),
     ],
     // Use the utility function to get the initial content
-    content: getInitialContent(),
+    content: DEFAULT_EDITOR_CONTENT_LOADING,
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
     editorProps: {
@@ -60,6 +64,12 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
       },
     },
   });
+
+  useEffect(() => {
+    if (editor) {
+      editor.commands.setContent(getInitialContent());
+    }
+  }, [editor]);
 
   return !editor ? (
     <div className="flex flex-col gap-2 relative">

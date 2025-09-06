@@ -5,11 +5,13 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import DragHandle from "@tiptap/extension-drag-handle-react";
 import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { all, createLowlight } from "lowlight";
-import { MenuBar } from "./MenuBar";
-import { ITipTapEditorProps } from "@/lib/models";
-import { DEFAULT_EDITOR_CONTENT, SESSION_STORAGE_KEY } from "@/lib/constants";
+import TextAlign from "@tiptap/extension-text-align";
 import { IconGripVertical } from "@tabler/icons-react";
+import { all, createLowlight } from "lowlight";
+
+import { MenuBar } from "./MenuBar";
+import { DEFAULT_EDITOR_CONTENT, SESSION_STORAGE_KEY } from "@/lib/constants";
+import { ITipTapEditorProps } from "@/lib/models";
 
 // create a lowlight instance with all languages loaded
 const lowlight = createLowlight(all);
@@ -55,6 +57,7 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
       CodeBlockLowlight.configure({
         lowlight,
       }),
+      TextAlign,
     ],
     // Use the utility function to get the initial content
     content: DEFAULT_EDITOR_CONTENT,

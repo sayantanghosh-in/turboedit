@@ -14,6 +14,7 @@ import { ItalicItem } from "./MenuBarOpts/ItalicItem";
 import { LinkItem } from "./MenuBarOpts/LinkItem";
 import { ListOptions } from "./MenuBarOpts/ListOptions";
 import { ParagraphItem } from "./MenuBarOpts/ParagraphItem";
+import { TextAlignOptions } from "./MenuBarOpts/TextAlignOptions";
 import { UnderlineItem } from "./MenuBarOpts/UnderlineItem";
 
 export const MenuBar = ({
@@ -43,6 +44,10 @@ export const MenuBar = ({
         isLink: editor.isActive("link"),
         isBulletListActive: editor.isActive("bulletList"),
         isOrderedListActive: editor.isActive("orderedList"),
+        isAlignLeft: editor.isActive({ textAlign: "left" }),
+        isAlignRight: editor.isActive({ textAlign: "right" }),
+        isAlignCenter: editor.isActive({ textAlign: "center" }),
+        isAlignJustified: editor.isActive({ textAlign: "justify" }),
       };
     },
   });
@@ -103,6 +108,10 @@ export const MenuBar = ({
           editorState={editorState as ICommonMenuBarOptProps["editorState"]}
         />
         <ListOptions
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
+        <TextAlignOptions
           editor={editor}
           editorState={editorState as ICommonMenuBarOptProps["editorState"]}
         />

@@ -36,6 +36,10 @@ export interface IEditorState {
   isLink: boolean;
   isBulletListActive: boolean;
   isOrderedListActive: boolean;
+  isAlignLeft: boolean;
+  isAlignRight: boolean;
+  isAlignCenter: boolean;
+  isAlignJustified: boolean;
 }
 
 export interface ICommonMenuBarOptProps {

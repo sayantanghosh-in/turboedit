@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { renderToMarkdown } from "@tiptap/static-renderer";
+import Image from "@tiptap/extension-image";
 import { toast } from "sonner";
 import StarterKit from "@tiptap/starter-kit";
 import SyntaxHighlighter from "react-syntax-highlighter";
@@ -73,7 +74,7 @@ export const Preview = (props: IEditorPreviewProps) => {
   useEffect(() => {
     if (props?.editorJsonContent) {
       const md = renderToMarkdown({
-        extensions: [StarterKit],
+        extensions: [StarterKit, Image],
         content: props?.editorJsonContent,
       });
       setEditorMarkdownContent(md);

@@ -10,11 +10,11 @@ import { Button } from "@/components/ui/button";
 
 import { BoldItem } from "./MenuBarOpts/BoldItem";
 import { HeadingOptions } from "./MenuBarOpts/HeadingOptions";
+import { ImageItem } from "./MenuBarOpts/ImageItem";
 import { ItalicItem } from "./MenuBarOpts/ItalicItem";
 import { LinkItem } from "./MenuBarOpts/LinkItem";
 import { ListOptions } from "./MenuBarOpts/ListOptions";
 import { ParagraphItem } from "./MenuBarOpts/ParagraphItem";
-import { TextAlignOptions } from "./MenuBarOpts/TextAlignOptions";
 import { UnderlineItem } from "./MenuBarOpts/UnderlineItem";
 
 export const MenuBar = ({
@@ -48,6 +48,7 @@ export const MenuBar = ({
         isAlignRight: editor.isActive({ textAlign: "right" }),
         isAlignCenter: editor.isActive({ textAlign: "center" }),
         isAlignJustified: editor.isActive({ textAlign: "justify" }),
+        isImage: !!editor?.getAttributes("image")?.src?.trim(),
       };
     },
   });
@@ -111,11 +112,11 @@ export const MenuBar = ({
           editor={editor}
           editorState={editorState as ICommonMenuBarOptProps["editorState"]}
         />
-        <TextAlignOptions
+        <LinkItem
           editor={editor}
           editorState={editorState as ICommonMenuBarOptProps["editorState"]}
         />
-        <LinkItem
+        <ImageItem
           editor={editor}
           editorState={editorState as ICommonMenuBarOptProps["editorState"]}
         />

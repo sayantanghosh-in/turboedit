@@ -40,6 +40,7 @@ export interface IEditorState {
   isAlignRight: boolean;
   isAlignCenter: boolean;
   isAlignJustified: boolean;
+  isImage: boolean;
 }
 
 export interface ICommonMenuBarOptProps {

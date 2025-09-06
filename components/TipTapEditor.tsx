@@ -3,9 +3,9 @@
 import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import DragHandle from "@tiptap/extension-drag-handle-react";
+import Image from "@tiptap/extension-image";
 import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import TextAlign from "@tiptap/extension-text-align";
 import { IconGripVertical } from "@tabler/icons-react";
 import { all, createLowlight } from "lowlight";
 
@@ -43,21 +43,21 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
             class: "list-disc ml-4",
           },
         },
-        orderedList: {
-          HTMLAttributes: {
-            class: "list-decimal ml-4",
-          },
-        },
         link: {
           defaultProtocol: "https",
           enableClickSelection: true,
           openOnClick: false,
         },
+        orderedList: {
+          HTMLAttributes: {
+            class: "list-decimal ml-4",
+          },
+        },
       }),
       CodeBlockLowlight.configure({
         lowlight,
       }),
-      TextAlign,
+      Image,
     ],
     // Use the utility function to get the initial content
     content: DEFAULT_EDITOR_CONTENT,

@@ -1,90 +1,25 @@
 "use client";
 
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { Editor, useEditorState } from "@tiptap/react";
-import {
-  IconBold,
-  IconCode,
-  IconHeading,
-  IconH1,
-  IconH2,
-  IconH3,
-  IconH4,
-  IconH5,
-  IconH6,
-  IconItalic,
-  IconLetterT,
-  IconList,
-  IconListNumbers,
-  IconUnderline,
-  IconRefresh,
-  IconLink,
-} from "@tabler/icons-react";
+import { IconCode, IconRefresh } from "@tabler/icons-react";
 
-import { ITipTapEditorProps, MenuBarOpt, MenuBarOptGroup } from "@/lib/models";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Toggle } from "./ui/toggle";
 import { SESSION_STORAGE_KEY } from "@/lib/constants";
+import { ICommonMenuBarOptProps, ITipTapEditorProps } from "@/lib/models";
+import { Button } from "@/components/ui/button";
 
-const LinkPopoverContent = ({
-  editor,
-  linkItem,
-}: {
-  editor: Editor;
-  linkItem: MenuBarOpt;
-}) => {
-  const [url, setUrl] = useState<string>(
-    editor?.getAttributes("link").href || ""
-  );
-
-  useEffect(() => {
-    // This effect runs whenever the PopoverContent is mounted
-    // and whenever the editor's state changes.
-    // It grabs the URL of the currently selected link and updates
-    // the local state for the input field.
-    const currentUrl = editor.isActive("link")
-      ? editor.getAttributes("link").href
-      : "";
-    setUrl(currentUrl);
-  }, [editor]);
-
-  return (
-    <PopoverContent className="w-80 flex items-center gap-2">
-      <Input
-        type="text"
-        placeholder="https://example.com/image300x300.png"
-        value={url}
-        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-          setUrl(e?.target?.value || "")
-        }
-      />
-      <Button onClick={() => linkItem?.action(url)}>Add</Button>
-    </PopoverContent>
-  );
-};
+import { BoldItem } from "./MenuBarOpts/BoldItem";
+import { HeadingOptions } from "./MenuBarOpts/HeadingOptions";
+import { ItalicItem } from "./MenuBarOpts/ItalicItem";
+import { LinkItem } from "./MenuBarOpts/LinkItem";
+import { ListOptions } from "./MenuBarOpts/ListOptions";
+import { ParagraphItem } from "./MenuBarOpts/ParagraphItem";
+import { UnderlineItem } from "./MenuBarOpts/UnderlineItem";
 
 export const MenuBar = ({
   editor,
   onViewCodeClick,
 }: Pick<ITipTapEditorProps, "onViewCodeClick"> & { editor: Editor | null }) => {
-  const [isHeadingDropdownOpen, setIsHeadingDropdownOpen] = useState(false);
-  const [isLinkItemPopoverOpen, setIsLinkItemPopoverOpen] =
-    useState<boolean>(false);
-  const [isListDropdownOpen, setIsListDropdownOpen] = useState(false);
-
   const editorState = useEditorState({
     editor,
     // the selector function is used to select the state you want to react to
@@ -130,308 +65,6 @@ export const MenuBar = ({
     }
   }, [editor, onViewCodeClick]);
 
-  const headingOptions: MenuBarOptGroup = useMemo(() => {
-    if (!editor) return [];
-    return [
-      {
-        id: "h1",
-        icon: (
-          <IconH1
-            className={
-              editorState?.isH1Active ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-        pressed: editorState?.isH1Active || false,
-      },
-      {
-        id: "h2",
-        icon: (
-          <IconH2
-            className={
-              editorState?.isH2Active ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-        pressed: editorState?.isH2Active || false,
-      },
-      {
-        id: "h3",
-        icon: (
-          <IconH3
-            className={
-              editorState?.isH3Active ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
-        pressed: editorState?.isH3Active || false,
-      },
-      {
-        id: "h4",
-        icon: (
-          <IconH4
-            className={
-              editorState?.isH4Active ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleHeading({ level: 4 }).run(),
-        pressed: editorState?.isH4Active || false,
-      },
-      {
-        id: "h5",
-        icon: (
-          <IconH5
-            className={
-              editorState?.isH5Active ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleHeading({ level: 5 }).run(),
-        pressed: editorState?.isH5Active || false,
-      },
-      {
-        id: "h6",
-        icon: (
-          <IconH6
-            className={
-              editorState?.isH6Active ? "text-blue-500" : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleHeading({ level: 6 }).run(),
-        pressed: editorState?.isH6Active || false,
-      },
-    ];
-  }, [
-    editor,
-    editorState?.isH1Active,
-    editorState?.isH2Active,
-    editorState?.isH3Active,
-    editorState?.isH4Active,
-    editorState?.isH5Active,
-    editorState?.isH6Active,
-  ]);
-
-  const paragraphItem: MenuBarOpt | undefined = useMemo(() => {
-    if (!editor) return;
-    return {
-      id: "paragraph",
-      icon: (
-        <IconLetterT
-          className={
-            editorState?.isParagraphActive ? "text-blue-500" : "text-gray-900"
-          }
-          size={14}
-        />
-      ),
-      action: () => editor.chain().focus().setParagraph().run(),
-      pressed: editorState?.isParagraphActive || false,
-    };
-  }, [editor, editorState?.isParagraphActive]);
-
-  const boldItem: MenuBarOpt | undefined = useMemo(() => {
-    if (!editor) return;
-    return {
-      id: "bold",
-      icon: (
-        <IconBold
-          className={editorState?.isBold ? "text-blue-500" : "text-gray-900"}
-          size={14}
-        />
-      ),
-      action: () => editor.chain().focus().toggleBold().run(),
-      pressed: editorState?.isBold || false,
-    };
-  }, [editor, editorState?.isBold]);
-
-  const italicItem: MenuBarOpt | undefined = useMemo(() => {
-    if (!editor) return;
-    return {
-      id: "italic",
-      icon: (
-        <IconItalic
-          className={editorState?.isItalic ? "text-blue-500" : "text-gray-900"}
-          size={14}
-        />
-      ),
-      action: () => editor.chain().focus().toggleItalic().run(),
-      pressed: editorState?.isItalic || false,
-    };
-  }, [editor, editorState?.isItalic]);
-
-  const underlineItem: MenuBarOpt | undefined = useMemo(() => {
-    if (!editor) return;
-    return {
-      id: "underline",
-      icon: (
-        <IconUnderline
-          className={
-            editorState?.isUnderline ? "text-blue-500" : "text-gray-900"
-          }
-          size={14}
-        />
-      ),
-      action: () => editor.chain().focus().toggleUnderline().run(),
-      pressed: editorState?.isUnderline || false,
-    };
-  }, [editor, editorState?.isUnderline]);
-
-  const listOptions = useMemo(() => {
-    if (!editor) return [];
-    return [
-      {
-        id: "bulletList",
-        icon: (
-          <IconList
-            className={
-              editorState?.isBulletListActive
-                ? "text-blue-500"
-                : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleBulletList().run(),
-        pressed: editorState?.isBulletListActive || false,
-      },
-      {
-        id: "orderedList",
-        icon: (
-          <IconListNumbers
-            className={
-              editorState?.isOrderedListActive
-                ? "text-blue-500"
-                : "text-gray-900"
-            }
-            size={14}
-          />
-        ),
-        action: () => editor.chain().focus().toggleOrderedList().run(),
-        pressed: editorState?.isOrderedListActive || false,
-      },
-    ];
-  }, [
-    editor,
-    editorState?.isBulletListActive,
-    editorState?.isOrderedListActive,
-  ]);
-
-  const linkItem: MenuBarOpt | undefined = useMemo(() => {
-    if (!editor) return;
-    return {
-      id: "link",
-      icon: (
-        <IconLink
-          className={editorState?.isLink ? "text-blue-500" : "text-gray-900"}
-          size={14}
-        />
-      ),
-      action: (url?: string) => {
-        // empty
-        if (!url || url === "") {
-          editor.chain().focus().extendMarkRange("link").unsetLink().run();
-
-          return;
-        }
-
-        // update link
-        try {
-          editor
-            .chain()
-            .focus()
-            .extendMarkRange("link")
-            .setLink({ href: url })
-            .run();
-        } catch (e) {
-          console.error("Error while doing link operation", e);
-        } finally {
-          setIsLinkItemPopoverOpen(false);
-        }
-      },
-      pressed: editorState?.isLink || false,
-    };
-  }, [editor, editorState?.isLink]);
-
-  const getSelectedHeadingToggle = useCallback(() => {
-    const selectedHeadingOptionIndex = editorState?.isH1Active
-      ? 0
-      : editorState?.isH2Active
-      ? 1
-      : editorState?.isH3Active
-      ? 2
-      : editorState?.isH4Active
-      ? 3
-      : editorState?.isH5Active
-      ? 4
-      : editorState?.isH6Active
-      ? 5
-      : -1;
-    return (
-      <Toggle
-        aria-label="Heading Options Trigger Toggle"
-        className={
-          selectedHeadingOptionIndex > -1
-            ? "text-blue-500 cursor-pointer bg-slate-200"
-            : "cursor-pointer bg-slate-100"
-        }
-        role="combobox"
-      >
-        {selectedHeadingOptionIndex > -1 ? (
-          headingOptions[selectedHeadingOptionIndex]?.icon
-        ) : (
-          <IconHeading className="text-gray-900" size={14} />
-        )}
-      </Toggle>
-    );
-  }, [
-    editorState?.isH1Active,
-    editorState?.isH2Active,
-    editorState?.isH3Active,
-    editorState?.isH4Active,
-    editorState?.isH5Active,
-    editorState?.isH6Active,
-    headingOptions,
-  ]);
-
-  const getSelectedListToggle = useCallback(() => {
-    const selectedListOptionIndex = editorState?.isBulletListActive
-      ? 0
-      : editorState?.isOrderedListActive
-      ? 1
-      : -1;
-    return (
-      <Toggle
-        aria-label="List Options Trigger Toggle"
-        className={
-          selectedListOptionIndex > -1
-            ? "text-blue-500 cursor-pointer bg-slate-200"
-            : "cursor-pointer bg-slate-100"
-        }
-        role="combobox"
-      >
-        {selectedListOptionIndex > -1 ? (
-          listOptions[selectedListOptionIndex]?.icon
-        ) : (
-          <IconList className="text-gray-900" size={14} />
-        )}
-      </Toggle>
-    );
-  }, [
-    editorState?.isBulletListActive,
-    editorState?.isOrderedListActive,
-    listOptions,
-  ]);
-
   useEffect(() => {
     try {
       if (editor && !editorState?.currentContentLength) {
@@ -449,156 +82,34 @@ export const MenuBar = ({
   return (
     <div className="sricky top-0 border p-2 bg-slate-50 rounded-md flex justify-between gap-4 md:gap-24">
       <div className=" flex items-center gap-2 overflow-x-auto">
-        {Array?.isArray(headingOptions) && headingOptions?.length > 0 ? (
-          <Popover
-            open={isHeadingDropdownOpen}
-            onOpenChange={setIsHeadingDropdownOpen}
-          >
-            <PopoverTrigger asChild>
-              {getSelectedHeadingToggle()}
-            </PopoverTrigger>
-            <PopoverContent className="w-10 p-0">
-              <Command>
-                <CommandList>
-                  <CommandEmpty>No Heading options found.</CommandEmpty>
-                  <CommandGroup>
-                    {headingOptions.map((headingOption) => (
-                      <CommandItem
-                        key={headingOption?.id}
-                        value={headingOption?.id}
-                        onSelect={() => {
-                          headingOption?.action();
-                          setIsHeadingDropdownOpen(false);
-                        }}
-                      >
-                        {headingOption?.icon}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        ) : (
-          <></>
-        )}
-        {paragraphItem ? (
-          <Toggle
-            aria-label="Paragraph Option Toggle"
-            className={
-              editorState?.isParagraphActive
-                ? "text-blue-500 cursor-pointer bg-slate-200"
-                : "cursor-pointer bg-slate-100"
-            }
-            onPressedChange={() => paragraphItem?.action()}
-          >
-            {paragraphItem?.icon}
-          </Toggle>
-        ) : (
-          <></>
-        )}
-        {boldItem ? (
-          <Toggle
-            aria-label="Bold Option Toggle"
-            className={
-              editorState?.isBold
-                ? "text-blue-500 cursor-pointer bg-slate-200"
-                : "cursor-pointer bg-slate-100"
-            }
-            onPressedChange={() => boldItem?.action()}
-          >
-            {boldItem?.icon}
-          </Toggle>
-        ) : (
-          <></>
-        )}
-        {italicItem ? (
-          <Toggle
-            aria-label="Italic Option Toggle"
-            className={
-              editorState?.isItalic
-                ? "text-blue-500 cursor-pointer bg-slate-200"
-                : "cursor-pointer bg-slate-100"
-            }
-            onPressedChange={() => italicItem?.action()}
-          >
-            {italicItem?.icon}
-          </Toggle>
-        ) : (
-          <></>
-        )}
-        {underlineItem ? (
-          <Toggle
-            aria-label="Underline Option Toggle"
-            className={
-              editorState?.isUnderline
-                ? "text-blue-500 cursor-pointer bg-slate-200"
-                : "cursor-pointer bg-slate-100"
-            }
-            onPressedChange={() => underlineItem?.action()}
-          >
-            {underlineItem?.icon}
-          </Toggle>
-        ) : (
-          <></>
-        )}
-        {Array?.isArray(listOptions) && listOptions?.length > 0 ? (
-          <Popover
-            open={isListDropdownOpen}
-            onOpenChange={setIsListDropdownOpen}
-          >
-            <PopoverTrigger asChild>{getSelectedListToggle()}</PopoverTrigger>
-            <PopoverContent className="w-10 p-0">
-              <Command>
-                <CommandList>
-                  <CommandEmpty>No List options found.</CommandEmpty>
-                  <CommandGroup>
-                    {listOptions.map((listOption) => (
-                      <CommandItem
-                        key={listOption?.id}
-                        value={listOption?.id}
-                        onSelect={() => {
-                          listOption?.action();
-                          setIsListDropdownOpen(false);
-                        }}
-                      >
-                        {listOption?.icon}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        ) : (
-          <></>
-        )}
-        {linkItem ? (
-          <Popover
-            open={isLinkItemPopoverOpen}
-            onOpenChange={setIsLinkItemPopoverOpen}
-          >
-            <PopoverTrigger asChild>
-              <Toggle
-                aria-label="Link Option Toggle"
-                className={
-                  editorState?.isLink
-                    ? "text-blue-500 cursor-pointer bg-slate-200"
-                    : "cursor-pointer bg-slate-100"
-                }
-              >
-                {linkItem?.icon}
-              </Toggle>
-            </PopoverTrigger>
-            <LinkPopoverContent
-              key={`popover-open-${isLinkItemPopoverOpen}`}
-              editor={editor}
-              linkItem={linkItem}
-            />
-          </Popover>
-        ) : (
-          <></>
-        )}
+        <HeadingOptions
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
+        <ParagraphItem
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
+        <BoldItem
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
+        <ItalicItem
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
+        <UnderlineItem
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
+        <ListOptions
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
+        <LinkItem
+          editor={editor}
+          editorState={editorState as ICommonMenuBarOptProps["editorState"]}
+        />
       </div>
       <div className="flex items-center gap-2 md:gap-4">
         <IconRefresh

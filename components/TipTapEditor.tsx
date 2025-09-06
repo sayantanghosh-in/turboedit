@@ -82,12 +82,7 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
   ) : (
     <div className="flex flex-col gap-2 relative">
       <MenuBar editor={editor} onViewCodeClick={props?.onViewCodeClick} />
-      <DragHandle
-        editor={editor}
-        computePositionConfig={{
-          placement: "left",
-        }}
-      >
+      <DragHandle editor={editor}>
         <IconGripVertical
           size={16}
           className="text-gray-900 hover:text-blue-500 cursor-grab"

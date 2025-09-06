@@ -1,4 +1,5 @@
 import { JSX } from "react";
+import { Editor } from "@tiptap/react";
 
 export type MenuBarOpt = {
   id: string;
@@ -16,4 +17,28 @@ export interface ITipTapEditorProps {
 export interface IEditorPreviewProps {
   editorJsonContent: object | null;
   setShowCodeSection: (showCodeSection: boolean) => void;
+}
+
+export interface IEditorState {
+  isEditable: boolean;
+  currentSelection: Selection;
+  currentContentLength: number;
+  isH1Active: boolean;
+  isH2Active: boolean;
+  isH3Active: boolean;
+  isH4Active: boolean;
+  isH5Active: boolean;
+  isH6Active: boolean;
+  isParagraphActive: boolean;
+  isBold: boolean;
+  isItalic: boolean;
+  isUnderline: boolean;
+  isLink: boolean;
+  isBulletListActive: boolean;
+  isOrderedListActive: boolean;
+}
+
+export interface ICommonMenuBarOptProps {
+  editor: Editor;
+  editorState: IEditorState | null;
 }

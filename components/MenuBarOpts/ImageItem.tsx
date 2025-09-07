@@ -2,7 +2,6 @@
 
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { IconPhotoScan } from "@tabler/icons-react";
-import { Editor } from "@tiptap/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,39 +12,82 @@ import {
 } from "@/components/ui/popover";
 import { Toggle } from "@/components/ui/toggle";
 
-import { ICommonMenuBarOptProps, MenuBarOpt } from "@/lib/models";
+import {
+  ICommonMenuBarOptProps,
+  MenuBarOpt,
+  MenuBarOptActionData,
+} from "@/lib/models";
 
 const ImagePopoverContent = ({
-  editor,
+  editorState,
   imageItem,
 }: {
-  editor: Editor;
+  editorState: ICommonMenuBarOptProps["editorState"];
   imageItem: MenuBarOpt;
 }) => {
   const [url, setUrl] = useState<string>(
-    editor?.getAttributes("image")?.src || ""
+    editorState?.imageAttributes?.src || ""
+  );
+  const [alt, setAlt] = useState<string>(
+    editorState?.imageAttributes?.alt || ""
+  );
+  const [width, setWidth] = useState<number>(
+    editorState?.imageAttributes?.width || 0
+  );
+  const [height, setHeight] = useState<number>(
+    editorState?.imageAttributes?.height || 0
   );
 
   useEffect(() => {
-    // This effect runs whenever the PopoverContent is mounted
-    // and whenever the editor's state changes.
-    // It grabs the src URL of the currently selected image and updates
-    // the local state for the input field.
-    const currentUrl = editor?.getAttributes("image")?.src || "";
+    const currentUrl = editorState?.imageAttributes?.src || "";
+    const currentAlt = editorState?.imageAttributes?.alt || "";
     setUrl(currentUrl);
-  }, [editor]);
+    setAlt(currentAlt);
+  }, [editorState?.imageAttributes?.alt, editorState?.imageAttributes?.src]);
 
   return (
-    <PopoverContent className="w-80 flex items-center gap-2">
+    <PopoverContent className="w-80 flex flex-col items-end gap-2">
       <Input
         type="text"
-        placeholder="https://example.com/image300x300.png"
+        placeholder="Image URL"
         value={url}
         onChange={(e: ChangeEvent<HTMLInputElement>) =>
           setUrl(e?.target?.value || "")
         }
       />
-      <Button onClick={() => imageItem?.action(url)}>Add</Button>
+      <Input
+        type="text"
+        placeholder="Image Alt Text"
+        value={alt}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          setAlt(e?.target?.value || "")
+        }
+      />
+      <div className="grid grid-cols-2 gap-2">
+        <Input
+          type="number"
+          placeholder="Width (in px)"
+          value={width}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setWidth(Number(e?.target?.value) || 0)
+          }
+        />
+        <Input
+          type="number"
+          placeholder="Height (in px)"
+          value={height}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            setHeight(Number(e?.target?.value) || 0)
+          }
+        />
+      </div>
+      <Button
+        onClick={() =>
+          imageItem?.action(url, { image: { alt, width, height } })
+        }
+      >
+        Add
+      </Button>
     </PopoverContent>
   );
 };
@@ -64,7 +106,7 @@ export const ImageItem = ({ editor, editorState }: ICommonMenuBarOptProps) => {
           size={14}
         />
       ),
-      action: (url?: string) => {
+      action: (url?: string, data?: MenuBarOptActionData) => {
         // empty
         if (!url || url === "") {
           return;
@@ -72,7 +114,16 @@ export const ImageItem = ({ editor, editorState }: ICommonMenuBarOptProps) => {
 
         // update link
         try {
-          editor.chain().focus().setImage({ src: url }).run();
+          editor
+            .chain()
+            .focus()
+            .setImage({
+              src: url,
+              alt: data?.image?.alt || "",
+              width: data?.image?.width || 0,
+              height: data?.image?.height || 0,
+            })
+            .run();
         } catch (e) {
           console.error("Error while doing image operation", e);
         } finally {
@@ -102,7 +153,7 @@ export const ImageItem = ({ editor, editorState }: ICommonMenuBarOptProps) => {
       </PopoverTrigger>
       <ImagePopoverContent
         key={`popover-open-${isImageItemPopoverOpen}`}
-        editor={editor}
+        editorState={editorState}
         imageItem={imageItem}
       />
     </Popover>

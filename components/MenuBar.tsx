@@ -3,6 +3,7 @@
 import { useCallback, useEffect } from "react";
 import { Editor, useEditorState } from "@tiptap/react";
 import { IconCode, IconRefresh } from "@tabler/icons-react";
+import { NodeSelection } from "@tiptap/pm/state";
 
 import { SESSION_STORAGE_KEY } from "@/lib/constants";
 import { ICommonMenuBarOptProps, ITipTapEditorProps } from "@/lib/models";
@@ -27,6 +28,56 @@ export const MenuBar = ({
     selector: ({ editor }) => {
       if (!editor) return null;
 
+      const isImage =
+        editor.isActive("image") ||
+        (editor.state.selection instanceof NodeSelection &&
+          editor.state.selection.node.isBlock);
+
+      // Get the attributes directly from the DOM element if an image wrapper is selected
+      const imageAttributes = (() => {
+        const { selection } = editor.state;
+        let isImageNodeSelected = false;
+        let nodeElement = null;
+
+        // Case 1: A NodeSelection is active, selecting the wrapper div
+        if (selection instanceof NodeSelection) {
+          if (selection.node.isBlock) {
+            isImageNodeSelected = true;
+            nodeElement = editor.view.nodeDOM(selection.from);
+          }
+        }
+
+        // Case 2: Cursor is inside the image wrapper, but a node is not explicitly selected
+        if (!isImageNodeSelected) {
+          const $pos = selection.$from;
+          for (let i = $pos.depth; i > 0; i--) {
+            const node = $pos.node(i);
+            if (node.type.name === "image") {
+              isImageNodeSelected = true;
+              // The pos-1 logic from the previous attempt was incorrect for this case
+              // Instead, we use the `from` position of the node
+              const pos = $pos.pos - node.nodeSize;
+              nodeElement = editor.view.nodeDOM(pos);
+              break;
+            }
+          }
+        }
+
+        // Safely check if the element exists and is a valid Element type
+        if (nodeElement instanceof Element) {
+          const imgElement = nodeElement.querySelector("img");
+          if (imgElement) {
+            return {
+              src: imgElement.getAttribute("src"),
+              alt: imgElement.getAttribute("alt"),
+              width: imgElement.getAttribute("width"),
+              height: imgElement.getAttribute("height"),
+            };
+          }
+        }
+        return null;
+      })();
+
       return {
         isEditable: editor.isEditable,
         currentSelection: editor.state.selection,
@@ -48,7 +99,8 @@ export const MenuBar = ({
         isAlignRight: editor.isActive({ textAlign: "right" }),
         isAlignCenter: editor.isActive({ textAlign: "center" }),
         isAlignJustified: editor.isActive({ textAlign: "justify" }),
-        isImage: !!editor?.getAttributes("image")?.src?.trim(),
+        isImage,
+        imageAttributes,
       };
     },
   });

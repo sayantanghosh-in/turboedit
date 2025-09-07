@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import DragHandle from "@tiptap/extension-drag-handle-react";
 import Image from "@tiptap/extension-image";
+import ImageResize from "tiptap-extension-resize-image";
 import StarterKit from "@tiptap/starter-kit";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { IconGripVertical } from "@tabler/icons-react";
@@ -58,6 +59,7 @@ export const TipTapEditor = (props: ITipTapEditorProps) => {
         lowlight,
       }),
       Image,
+      ImageResize,
     ],
     // Use the utility function to get the initial content
     content: DEFAULT_EDITOR_CONTENT,

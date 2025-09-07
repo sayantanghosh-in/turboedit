@@ -1,10 +1,18 @@
 import { JSX } from "react";
 import { Editor } from "@tiptap/react";
 
+export type MenuBarOptActionData = {
+  image: {
+    alt: string;
+    width: number;
+    height: number;
+  };
+};
+
 export type MenuBarOpt = {
   id: string;
   icon: JSX.Element;
-  action: (arg?: string) => void;
+  action: (arg?: string, data?: MenuBarOptActionData) => void;
   pressed: boolean;
 };
 
@@ -41,6 +49,12 @@ export interface IEditorState {
   isAlignCenter: boolean;
   isAlignJustified: boolean;
   isImage: boolean;
+  imageAttributes: {
+    src: string;
+    alt: string;
+    width: number;
+    height: number;
+  };
 }
 
 export interface ICommonMenuBarOptProps {

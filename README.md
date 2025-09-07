@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TurboEdit 🚀
 
-## Getting Started
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-First, run the development server:
+TurboEdit is a blazing-fast, minimalist WYSIWYG editor that generates clean Markdown for your next great article, blog post, or documentation page. Built with the modern Tiptap editor framework, it provides a seamless writing experience with powerful features for content creators and developers.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Live Demo 🔗 [https://turboedit.sayantanghosh.in](https://turboedit.sayantanghosh.in)**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+![TurboEdit Demo GIF](https://i.imgur.com/your-turboedit-demo.gif)
+_(Suggestion: Record a short GIF showing the editing experience, adding front matter, and switching to the code view.)_
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Key Features
 
-## Learn More
+- ✨ **Intuitive WYSIWYG Editor:** Write and format your content seamlessly with a clean, "what you see is what you get" interface.
+- </> **Instant Markdown Generation:** Effortlessly switch to a code view and export clean, compliant Markdown with a single click.
+- 📝 **Built-in Front Matter:** Easily add and configure YAML front matter, perfect for blogs, documentation, and static site generators.
+- 🧰 **Rich Formatting Toolkit:** Full support for headers, lists, links, images, code blocks, bold, italics, and much more.
+- 🚀 **Lightweight & Fast:** A minimal, distraction-free editor designed for speed and efficiency to keep you in the flow.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+_(You can fill this section with the technologies you used)_
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Editor Core:** [Tiptap](https.tiptap.dev/)
+- **Frontend:** [e.g., React, Next.js, Vite]
+- **Styling:** [e.g., Tailwind CSS, Styled Components]
 
-## Deploy on Vercel
+## 📦 Getting Started
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Follow these instructions to get a copy of the project up and running on your local machine.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Prerequisites
+
+- Node.js (v18.x or higher)
+- pnpm, yarn, or npm
+
+### Installation
+
+1.  Clone the repository:
+    ```sh
+    git clone [https://github.com/sayantanghosh-in/turboedit.git](https://github.com/sayantanghosh-in/turboedit.git)
+    ```
+2.  Navigate to the project directory:
+    ```sh
+    cd turboedit
+    ```
+3.  Install the dependencies:
+    ```sh
+    pnpm install
+    # or
+    yarn install
+    # or
+    npm install
+    ```
+4.  (If applicable) Set up your environment variables. Create a `.env.local` file in the root. For a client-side editor, this step might not be necessary.
+
+### Available Scripts
+
+- To run the app in development mode, execute:
+
+  ```sh
+  pnpm dev
+  # or
+  yarn dev
+  # or
+  npm run dev
+  ```
+
+  Open the local server URL (e.g., [http://localhost:5173](http://localhost:5173)) in your browser.
+
+- To build the app for production, execute:
+  ```sh
+  pnpm build
+  # or
+  yarn build
+  # or
+  npm run build
+  ```
+
+## 🤝 Contributing
+
+We love contributions! Whether it's a bug report, a new feature, or a documentation fix, your help is welcome and appreciated.
+
+Please read our [**Contributing Guidelines**](./CONTRIBUTING.md) to learn how you can get started.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgements
+
+- This project would not be possible without the incredible open-source work of the [Tiptap](https://tiptap.dev/) team.
+
+---
+
+Made with ❤️ by Sayantan Ghosh

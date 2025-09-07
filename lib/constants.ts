@@ -1,9 +1,15 @@
 export const DEFAULT_EDITOR_CONTENT = `<div class="content">
   <h1>Welcome to TurboEdit 🚀</h1>
   <p></p>
-  <p>This is a beautiful blank canvas, but it's not actually blank! We've populated it with this document to show you what our app can do right out of the box.</p>
+  <p>This is a beautiful blank canvas, but it's not actually blank! I've populated it with this document to show you what our app can do right out of the box.</p>
   <p></p>
-  <p>Try editing this text on the left. As you type, you'll see the rendered result instantly appear here on the right.</p>
+  <p>Try editing this text on the editor. After you type, click on the "View Code" button at the top to get the markdown output.</p>
+  <p></p>
+  <p>The markdown output also contains a feature of adding Front Matter to your markdown.</p>
+  <p></p>
+  <p>This editor is created using TipTap editor. Please check <a href="https://tiptap.dev/docs">the documentation</a> to learn more.</p>
+  <p></p>
+  <p>Contact <a href="https://sayantanghosh.in">me</a> for any support. Happy to help 🙂</p>
   <p></p>
   <h3>Markdown Showcase</h3>
   <p>This section demonstrates some of the most common Markdown syntax.</p>
@@ -38,7 +44,7 @@ export const DEFAULT_EDITOR_CONTENT = `<div class="content">
   </ol>
   <p></p>
   <h4>Links</h4>
-  <p>Create a link to a website like this: <a href="https://www.google.com">Visit Google</a>.</p>
+  <p>Create a link to a website like this: <a href="https://sayantanghosh.in">Visit my website</a>.</p>
   <p></p>
   <h4>Code</h4>
   <p>You can display <code>inline code</code> or a full code block like this:</p>
